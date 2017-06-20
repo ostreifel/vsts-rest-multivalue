@@ -11,33 +11,26 @@
     "publish:dev": "npm run package:dev && node ./scripts/publishDev",
     "build:release": "npm run clean && mkdir dist && webpack --progress --colors --output-path ./dist -p",
     "publish:release": "npm run build:release && node ./scripts/publishRelease",
-    "test": "karma start --single-run",
-    "postinstall": "typings install"
+    "test": "karma start --single-run"
   },
-  "devDependencies": {    
-    "@types/react": "^15.0.21",
-    "@types/react-dom": "^0.14.23",
+  "devDependencies": {
     "@types/jquery": "^2.0.41",
     "@types/q": "^1.0.0",
-    "webpack": "^2.3.3",
-    "webpack-dev-server": "^2.4.2",
+    "@types/react": "^0.14.57",
+    "@types/react-dom": "^0.14.13",
+    "vss-web-extension-sdk": "^2.117.0",
+    "copy-webpack-plugin": "^4.0.1",
+    "css-loader": "^0.28.0",
     "rimraf": "^2.6.1",
     "style-loader": "^0.16.1",
-    "css-loader": "^0.28.0",
     "ts-loader": "^2.0.3",
-    "tfx-cli": "^0.4.5",
     "typescript": "^2.2.2",
-    "typings": "^2.1.0",
     "uglifyjs-webpack-plugin": "^0.4.2",
-    "copy-webpack-plugin": "^4.0.1"
-  },
-  "dependencies": {
-    "vss-web-extension-sdk": "^2.114.0"
+    "webpack": "^2.3.3",
+    "webpack-dev-server": "^2.4.2"
   },
   "name": "multivalue-control-extension",
   "license": "MIT",
   "description": "VSTS Work Item Form Multivalue Control Extension",
-  "repository": "",
-  "private": false,
-  "version": "0.0.0"
+  "private": false
 }

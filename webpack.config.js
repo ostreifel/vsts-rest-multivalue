@@ -37,14 +37,14 @@ module.exports = {
         ]
     },
     plugins: [
-        new UglifyJSPlugin({
-            compress: {
-                warnings: false
-            },
-            output: {
-                comments: false
-            }
-        }),
+        // new UglifyJSPlugin({
+        //     compress: {
+        //         warnings: false
+        //     },
+        //     output: {
+        //         comments: false
+        //     }
+        // }),
         new CopyWebpackPlugin([
             { from: "./node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js", to: "libs/VSS.SDK.min.js" },
             { from: "./src/index.html", to: "./" },

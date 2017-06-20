@@ -1,4 +1,4 @@
-In TFS, the layout for a work item type is defined via XML. Therefore, you will have to add the Multivalue control to your layout. Here's the series of steps that tell you how to do it.
+In TFS, the layout for a work item type is defined via XML. Therefore, you will have to add the Rest Multivalue control to your layout. Here's the series of steps that tell you how to do it.
  
 Learn more about WebLayout XML [here](https://www.visualstudio.com/docs/work/reference/weblayout-xml-elements).
 
@@ -14,11 +14,11 @@ Learn more about WebLayout XML [here](https://www.visualstudio.com/docs/work/ref
         <!--**********************Work Item Extensions**********************
 
 Extension:
-	Name: vsts-extensions-multivalue-control
-	Id: ms-devlabs.vsts-extensions-multivalue-control
+	Name: vsts-rest-multivalue-control
+	Id: ms-devlabs.vsts-rest-multivalue-control
 
 	Control contribution:
-		Id: ms-devlabs.vsts-extensions-multivalue-control.multivalue-form-control
+		Id: ms-devlabs.vsts-rest-multivalue-control.multivalue-form-control
 		Description: A work item form control which allows selection of multiple values.
 		Inputs:
 			Id: FieldName
@@ -28,8 +28,8 @@ Extension:
 			Data Type: String
 			IsRequired: true
 
-			Id: Values
-			Description: Values can be user provided or from suggested values of the backing field
+			Id: Url
+			Description: Url for the suggested values
 			Data Type: String
 			IsRequired: false
 
@@ -50,7 +50,7 @@ http://go.microsoft.com/fwlink/?LinkId=816513
         -->
 
         <Extensions>
-            <Extension Id="ms-devlabs.vsts-extensions-multivalue-control" />
+            <Extension Id="ms-devlabs.vsts-rest-multivalue-control" />
         </Extensions>
      ```
 
@@ -60,12 +60,12 @@ http://go.microsoft.com/fwlink/?LinkId=816513
         <!--**********************************Work Item Extensions***************************
 
     Extension:
-        Name: vsts-extensions-multivalue-control
-        Id: ms-devlabs.vsts-extensions-multivalue-control
+        Name: vsts-rest-multivalue-control
+        Id: ms-devlabs.vsts-rest-multivalue-control
         ...
 ```
 
-4. Add the ControlContribution tag for your Multivalue control. This example adds it to the "Planning" group.
+4. Add the ControlContribution tag for your Rest Multivalue control. This example adds it to the "Planning" group.
 
 ```xml
     <Page Id="Details">
@@ -74,7 +74,7 @@ http://go.microsoft.com/fwlink/?LinkId=816513
         ...
             <Group Id="Planning">
             ...
-                <ControlContribution Label="Label" Id="ms-devlabs.vsts-extensions-multivalue-control.multivalue-form-control">
+                <ControlContribution Label="Label" Id="ms-devlabs.vsts-rest-multivalue-control.multivalue-form-control">
                     <Inputs>
                         <Input Id="FieldName" Value="RefNameOfTheField" />
                     </Inputs>
@@ -90,7 +90,7 @@ You can find the contribution ID and input information within the commented blob
      ...
 
 	Control contribution:
-		Id: ms-devlabs.vsts-extensions-multivalue-control.multivalue-form-control
+		Id: ms-devlabs.vsts-rest-multivalue-control.multivalue-form-control
 		Description: A work item form control which allows selection of multiple values.
 		Inputs:
 			Id: FieldName
@@ -100,13 +100,13 @@ You can find the contribution ID and input information within the commented blob
 			Data Type: String
 			IsRequired: true
 
-			Id: Values
-			Description: Values can be user provided or from suggested values of the backing field
+			Id: Url
+			Description: Url for the suggested values
 			Data Type: String
 			IsRequired: false
 ```
 
-For the input tag, the content of the `Id` attribute can be either `FieldName` or `Values`.
+For the input tag, the content of the `Id` attribute can be either `FieldName` or `Url`.
 
 If the Id is FieldName, the content of the `Value` attribute should be the name of the field that you want to fill. Suppose you have a field called `MyNamespace.MyField`, the input tag becomes:
 

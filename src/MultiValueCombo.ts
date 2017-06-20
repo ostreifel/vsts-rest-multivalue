@@ -4,6 +4,7 @@ import * as Utils_String from "VSS/Utils/String";
 import Q = require("q");
 import * as VSSUtilsCore from "VSS/Utils/Core";
 import {BaseMultiValueControl} from "./BaseMultiValueControl";
+import { callApi } from "./RestCall";
 
 export class MultiValueCombo extends BaseMultiValueControl {
     /* 
@@ -316,26 +317,27 @@ export class MultiValueCombo extends BaseMultiValueControl {
         var defer = Q.defer<any>();
         var inputs: IDictionaryStringTo<string> = VSS.getConfiguration().witInputs;
 
-        var valuesString: string = inputs["Values"];
-        if (valuesString) {
-            defer.resolve(valuesString.split(";"));
-        }
-        // if the values input were not specified as an input, get the suggested values for the field.
-        else {
-            WitService.WorkItemFormService.getService().then(
-                (service: any) => {
-                    service.getAllowedFieldValues(this.fieldName).then(
-                        (values: string[]) => {
-                            defer.resolve(values);
-                        },
-                        () => {
-                            this.showError("Could not load values for field " + this.fieldName)
-                        }
-                    )
-                }
-            );
-        }
+        var url: string = inputs["Url"];
+        callApi(url, "GET", undefined, undefined, (data) => {
+            defer.resolve(this._findArr(data));
+        }, (error) => {
+            defer.reject(error);
+        });
 
         return defer.promise;
+    }
+    private _findArr(data: object) {
+        const inputs: IDictionaryStringTo<string> = VSS.getConfiguration().witInputs;
+        var property: string = inputs["Property"];
+        const objs: object[] = [data];
+        for (let obj = objs.shift(); obj; obj = objs.shift()) {
+            if (Array.isArray(obj)) {
+                return property ? obj.map(o => o[property]) : obj;
+            } else if (typeof obj === "object") {
+                for (const key in obj) {
+                    objs.push(obj[key]);
+                }
+            }
+        }
     }
 }

@@ -326,12 +326,16 @@ export class MultiValueCombo extends BaseMultiValueControl {
 
         return defer.promise;
     }
-    private _findArr(data: object) {
+    // Convert unknown data type to string[]
+    private _findArr(data: object): string[] {
         const inputs: IDictionaryStringTo<string> = VSS.getConfiguration().witInputs;
         var property: string = inputs["Property"];
+        // Look for an array: object itself or one of its properties
         const objs: object[] = [data];
         for (let obj = objs.shift(); obj; obj = objs.shift()) {
             if (Array.isArray(obj)) {
+                // If configuration has a the Property property set then map from objects to strings
+                // Otherwise assume already strings
                 return property ? obj.map(o => o[property]) : obj;
             } else if (typeof obj === "object") {
                 for (const key in obj) {

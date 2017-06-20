@@ -1,4 +1,4 @@
-Use data from urls like build definitions as the suggested values of a multivalue control
+Use data from urls as the suggested values of a multivalue control
 
 ![Work Item Form](img/form.png)
 

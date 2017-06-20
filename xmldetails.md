@@ -15,10 +15,10 @@ Learn more about WebLayout XML [here](https://www.visualstudio.com/docs/work/ref
 
 Extension:
 	Name: vsts-rest-multivalue-control
-	Id: ms-devlabs.vsts-rest-multivalue-control
+	Id: ottostreifel.vsts-rest-multivalue-control
 
 	Control contribution:
-		Id: ms-devlabs.vsts-rest-multivalue-control.multivalue-form-control
+		Id: ottostreifel.vsts-rest-multivalue-control.multivalue-form-control
 		Description: A work item form control which allows selection of multiple values.
 		Inputs:
 			Id: FieldName
@@ -50,7 +50,7 @@ http://go.microsoft.com/fwlink/?LinkId=816513
         -->
 
         <Extensions>
-            <Extension Id="ms-devlabs.vsts-rest-multivalue-control" />
+            <Extension Id="ottostreifel.vsts-rest-multivalue-control" />
         </Extensions>
      ```
 
@@ -61,7 +61,7 @@ http://go.microsoft.com/fwlink/?LinkId=816513
 
     Extension:
         Name: vsts-rest-multivalue-control
-        Id: ms-devlabs.vsts-rest-multivalue-control
+        Id: ottostreifel.vsts-rest-multivalue-control
         ...
 ```
 
@@ -74,7 +74,7 @@ http://go.microsoft.com/fwlink/?LinkId=816513
         ...
             <Group Id="Planning">
             ...
-                <ControlContribution Label="Label" Id="ms-devlabs.vsts-rest-multivalue-control.multivalue-form-control">
+                <ControlContribution Label="Label" Id="ottostreifel.vsts-rest-multivalue-control.multivalue-form-control">
                     <Inputs>
                         <Input Id="FieldName" Value="RefNameOfTheField" />
                     </Inputs>
@@ -90,7 +90,7 @@ You can find the contribution ID and input information within the commented blob
      ...
 
 	Control contribution:
-		Id: ms-devlabs.vsts-rest-multivalue-control.multivalue-form-control
+		Id: ottostreifel.vsts-rest-multivalue-control.multivalue-form-control
 		Description: A work item form control which allows selection of multiple values.
 		Inputs:
 			Id: FieldName
@@ -103,6 +103,11 @@ You can find the contribution ID and input information within the commented blob
 			Id: Url
 			Description: Url for the suggested values
 			Data Type: String
+			IsRequired: true
+
+			Id: Property
+			Description: If the url returns an array of objects, select which object property to use as the string. Leave blank if the server returns an array of strings.
+			Data Type: String
 			IsRequired: false
 ```
 
@@ -114,19 +119,6 @@ If the Id is FieldName, the content of the `Value` attribute should be the name 
 <Input Id="FieldName" Value="MyNamespace.MyField" />
 ```
 
-To provide a list of value from a global list, you should add `SUGGESTEDVALUES` tag in the field definition.
-
-```XML
-<WORKITEMTYPE name="MyWIT">
-    ...
-    <FIELDS>
-        ...
-        <FIELD name="MyField" refname="MyNamespace.MyField" type="String">
-            <SUGGESTEDVALUES expanditems="true">
-                <GLOBALLIST name="MyGlobalList" />
-            </SUGGESTEDVALUES>
-        </FIELD>
-```
 
 5. Re-import the *.xml* file, using witadmin. 
 ```

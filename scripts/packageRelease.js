@@ -3,7 +3,7 @@
 var exec = require("child_process").exec;
 
 // Package extension
-var command = `tfx extension create --overrides-file configs/release.json --manifest-globs vss-extension.json --no-prompt --json`;
+var command = `tfx extension create --overrides-file configs/release.json  --rev-version --manifest-globs vss-extension.json --no-prompt --json`;
 exec(command, (error, stdout) => {
     if (error) {
         console.error(`Could not create package: '${error}'`);

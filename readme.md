@@ -1,28 +1,12 @@
-Use data from urls as the suggested values of a multivalue control
+This a fork of the [multi value extension](https://github.com/Microsoft/vsts-extension-multivalue-control) that draws its values from an admin specified rest endpoint rather than a hard coded list.
 
-![Work Item Form](img/form.png)
-
-
-# How to get started
-## Visual Studio Team Services
-
-Navigate to your work item form customization page and add a rest multivalue control.
-
-![Layout Customization](img/layoutCustomization.png)
-
-Edit the control so it can use the right field to store your selection and the right url/property combination to be displayed. For example
-```
-https://<account>.visualstudio.com/<project>/_apis/build/definitions?api-version=3.0
-```
-```
-name
+## To Build
+```cmd
+npm i -g typescript tslint gulp tfx-cli
+git clone git clone https://github.com/ostreifel/vsts-rest-multivalue.git
+cd vsts-rest-multivalue
+npm i
+npm run package:dev
 ```
 
-![Options](img/options.png)
-
-# How to query
-
-The selected values are stored in a semicolon separated format.  To search for items that have a specific value use the "Contains Words" operator.  If searching for multiple values, use multipe "Contains Words" clauses for that field.
-
-# Build 
-You can also learn how to build your own custom control extension for the work item form [here](https://www.visualstudio.com/en-us/docs/integrate/extensions/develop/custom-control). 
+all build tasks are contained in package.json

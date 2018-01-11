@@ -11,21 +11,23 @@
     "publish:dev": "npm run package:dev && node ./scripts/publishDev",
     "build:release": "npm run clean && mkdir dist && webpack --progress --colors --output-path ./dist -p",
     "publish:release": "npm run build:release && node ./scripts/publishRelease",
-    "test": "karma start --single-run"
+    "test": "karma start --single-run",
+    "postinstall": "typings install"
   },
   "devDependencies": {
     "@types/jquery": "^2.0.41",
     "@types/q": "^1.0.0",
     "@types/react": "^0.14.57",
     "@types/react-dom": "^0.14.13",
-    "vss-web-extension-sdk": "^2.117.0",
     "copy-webpack-plugin": "^4.0.1",
     "css-loader": "^0.28.0",
     "rimraf": "^2.6.1",
     "style-loader": "^0.16.1",
     "ts-loader": "^2.0.3",
     "typescript": "^2.2.2",
+    "typings": "^2.1.1",
     "uglifyjs-webpack-plugin": "^0.4.2",
+    "vss-web-extension-sdk": "^2.117.0",
     "webpack": "^2.3.3",
     "webpack-dev-server": "^2.4.2"
   },

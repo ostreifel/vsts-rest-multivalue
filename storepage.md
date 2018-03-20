@@ -17,8 +17,31 @@ https://<account>.visualstudio.com/<project>/_apis/build/definitions?api-version
 ```
 name
 ```
-
 ![Options](img/options.png)
+
+If the name is specified it look for the first array in the response and get that property of the array of returned objects.
+
+If property: ```name```
+
+Valid response body:
+```
+{
+    value: [
+        {name: 'a'},
+        {name: 'b'},
+        {name: 'c'}
+    ]
+}
+```
+
+If left blank it will look for the first array in the response and use that (response can just be an array of string too). Example response
+```
+{
+    value: ['1','2',3']
+}
+```
+
+
 
 # How to query
 

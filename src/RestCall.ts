@@ -8,31 +8,34 @@ export function callApi(url: string,
     VSS.getAccessToken().then((sessionToken) => {
         const authorizationHeaderValue = authTokenManager.getAuthorizationHeader(sessionToken);
         $.ajax({
-            url: url,
-            method: method,
+            url,
+            method,
             data: data || "",
-            success: function (data, textStatus, jqueryXHR) {
-                success(data);
+            success: (responseData, textStatus, jqueryXHR) => {
+                success(responseData);
             },
-            error: function (jqXHR, textStatus, errorThrown) {
+            error: (jqXHR, textStatus, errorThrown) => {
                 if (jqXHR.responseJSON || 401 !== jqXHR.status && 403 !== jqXHR.status) {
                     if (jqXHR.responseJSON) {
                         failure(jqXHR.responseJSON, errorThrown, jqXHR.status);
                     } else {
-                        failure({name: "CallFailure", message: "call failed with status code " + jqXHR.status}, errorThrown, jqXHR.status);
+                        failure(
+                            {name: "CallFailure", message: "call failed with status code " + jqXHR.status},
+                            errorThrown, jqXHR.status,
+                        );
                     }
                 } else {
                     failure({name: "AuthorizationFailure", message: "unauthorized call"}, errorThrown, jqXHR.status);
                 }
             },
-            beforeSend: function (jqXHR) {
+            beforeSend: (jqXHR) => {
                 jqXHR.setRequestHeader("Authorization", authorizationHeaderValue);
                 if (headers) {
                     for (const header in headers) {
                         jqXHR.setRequestHeader(header, headers[header]);
                     }
                 }
-            }
+            },
         } as JQueryAjaxSettings);
     });
 }

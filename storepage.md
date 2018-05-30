@@ -47,5 +47,18 @@ If left blank it will look for the first array in the response and use that (res
 
 The selected values are stored in a semicolon separated format.  To search for items that have a specific value use the "Contains Words" operator.  If searching for multiple values, use multipe "Contains Words" clauses for that field.
 
+Alternatively if the Property field starts with '$' it will use the [JSONPath Syntax](http://jsonpath.com/)
+
+**Example:**
+
+Url
+```
+https://<account>.visualstudio.com/<project>/_apis/wit/workitemtypes?api-version=3.0
+```
+Property
+```
+$.value[*].icon.id
+```
+
 # Build 
 You can also learn how to build your own custom control extension for the work item form [here](https://www.visualstudio.com/en-us/docs/integrate/extensions/develop/custom-control). 

@@ -1,3 +1,4 @@
+import * as JSONPath from "jsonpath";
 import Q = require("q");
 import * as WitService from "TFS/WorkItemTracking/Services";
 import * as Utils_Array from "VSS/Utils/Array";
@@ -322,6 +323,9 @@ export class MultiValueCombo extends BaseMultiValueControl {
     private _findArr(data: object): string[] {
         const inputs: IDictionaryStringTo<string> = VSS.getConfiguration().witInputs;
         const property: string = inputs.Property;
+        if (property && property[0] === "$") {
+            return JSONPath.query(data, property);
+        }
         // Look for an array: object itself or one of its properties
         const objs: object[] = [data];
         for (let obj = objs.shift(); obj; obj = objs.shift()) {

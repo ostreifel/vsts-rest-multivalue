@@ -6,6 +6,7 @@ npm i -g typescript tslint gulp tfx-cli
 git clone git clone https://github.com/ostreifel/vsts-rest-multivalue.git
 cd vsts-rest-multivalue
 npm i
+npm run build:release
 npm run package:dev
 ```
 

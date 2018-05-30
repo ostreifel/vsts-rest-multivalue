@@ -20,6 +20,9 @@ module.exports = {
         },
         /^VSS\/.*/, /^TFS\/.*/, /^q$/
     ],
+    node: {
+        fs: "empty"
+    },
     resolve: {
         extensions: [".webpack.js", ".web.js", ".ts", ".tsx", ".js"],
         moduleExtensions: ["-loader"],
@@ -52,5 +55,6 @@ module.exports = {
             { from: "./img", to: "img" },
             { from: "./readme.md", to: "readme.md" }
         ])
-    ]
+    ],
+    devtool: "sourcemap"
 }

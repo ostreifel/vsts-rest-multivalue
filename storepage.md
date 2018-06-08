@@ -40,7 +40,26 @@ If left blank it will look for the first array in the response and use that (res
     value: ['1','2',3']
 }
 ```
-
+## On Premises
+Navigate the process template xml.
+For each work item type to customize at the location 
+```xpath
+/WITD/WORKITEMTYPE/FORM/WebLayout/Extensions
+```
+add 
+```xml
+<Extension Id="ottostreifel.vsts-rest-multivalue-control" />
+```
+Within the same Weblayout choose a group element and add
+```xml
+              <ControlContribution Id="ottostreifel.vsts-rest-multivalue-control.multivalue-form-control" Label="<control name>"  >
+                <Inputs>
+                  <Input Id="FieldName" Value="<longtext field reference name>" />
+                  <Input Id="Url" Value="<url>" />
+                  <Input Id="Property" Value="<property path>" />
+                </Inputs>
+              </ControlContribution>
+```
 
 
 # How to query

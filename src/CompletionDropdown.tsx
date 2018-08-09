@@ -59,6 +59,8 @@ export class CompletionDropdown extends React.Component<ICompletionDropdownProps
                 onEmptyInputFocus={(selected) => this.props.resolveSuggestions("", selected)}
                 onGetMoreResults={(filter, selected) => this.props.resolveSuggestions(filter, selected)}
                 defaultSelectedItems={this.props.selected}
+                onBlur={console.log.bind(console, "blur")}
+                onFocus={console.log.bind(console, "focus")}
                 inputProps={{
                     placeholder: this.props.placeholder,
                     readOnly: this.props.readOnly,

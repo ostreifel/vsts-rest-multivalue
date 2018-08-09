@@ -1,34 +1,51 @@
-import * as JSONPath from "jsonpath";
 import { ITag } from "office-ui-fabric-react/lib/components/pickers/TagPicker/TagPicker";
 import { initializeIcons } from "office-ui-fabric-react/lib/Icons";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { WorkItemFormService } from "TFS/WorkItemTracking/Services";
+import { DelayedFunction } from "VSS/Utils/Core";
 import { CompletionDropdown } from "./CompletionDropdown";
-import { callApi } from "./RestCall";
+import { searchValues } from "./searchValues";
 
 initializeIcons();
 export class MultiValueCombo {
     public readonly fieldName = VSS.getConfiguration().witInputs.FieldName;
-    private _suggestedValues: Promise<string[]>;
+    private readonly _container = document.getElementById("container") as HTMLElement;
+    private readonly _throttledRefresh = new DelayedFunction(null, 200, "resize", () => {
+        console.log("resizing", this._isDropdownVisible);
+        if (this._isDropdownVisible) {
+            VSS.resize(undefined, (this._container.scrollHeight || 36) + 35 * 6);
+        } else {
+            VSS.resize();
+        }
+    });
+    private _isDropdownVisible: boolean;
 
     public async refresh(): Promise<void> {
-
         ReactDOM.render(<CompletionDropdown
             selected={await this._getSelected()}
-            resolveSuggestions={this._searchValues.bind(this)}
+            resolveSuggestions={(this._searchValues.bind(this))}
             onSelectionChanged={(selected) => this._setSelected(selected)}
+            width={this._container.scrollWidth}
             placeholder="No selection made"
             loadingText="Getting values..."
-            onDismiss={this._resize.bind(this)}
-        />, document.getElementById("container"), this._resize.bind(this));
+            onDismiss={console.log.bind(console, "dismiss")}
+        />, this._container);
+    }
+
+    private async _searchValues(filter: string, selected?: ITag[]) {
+        console.log("search values", filter);
+        this._resize("show drowndown");
+        return searchValues(filter, selected);
     }
 
     private async _resize(dropdown?: "show drowndown") {
         if (dropdown) {
-            VSS.resize(undefined, ($(".container").height() || 36) + 35 * 6);
+            this._isDropdownVisible = true;
+            this._throttledRefresh.invokeNow();
         } else {
-            VSS.resize();
+            this._isDropdownVisible = false;
+            this._throttledRefresh.reset();
         }
     }
 
@@ -44,56 +61,5 @@ export class MultiValueCombo {
         const formService = await WorkItemFormService.getService();
         const text = values.map(({name}) => name).join(";");
         formService.setFieldValue(this.fieldName, text);
-    }
-
-    private async _searchValues(filter: string, selected?: ITag[]) {
-        this._resize("show drowndown");
-        filter = filter.toLowerCase();
-        const selectedSet: {[name: string]: boolean} = {};
-        for (const {name} of selected || []) {
-            selectedSet[name] = true;
-        }
-        const values = await this._getSuggestedValues();
-
-        const lower = (v: string) => v.toLocaleLowerCase();
-        const suggested = [
-            ...values.filter((v) => lower(v).indexOf(filter) === 0).filter((v) => !selectedSet.hasOwnProperty(v)),
-            ...values.filter((v) => lower(v).indexOf(filter) > 0).filter((v) => !selectedSet.hasOwnProperty(v)),
-        ].map((name) => ({name, key: name}));
-        return suggested;
-    }
-
-    private async _getSuggestedValues(): Promise<string[]> {
-        if (this._suggestedValues) {
-            return this._suggestedValues;
-        }
-        const inputs: IDictionaryStringTo<string> = VSS.getConfiguration().witInputs;
-
-        const url: string = inputs.Url;
-        return this._suggestedValues = new Promise<string[]>((resolve, reject) =>
-            callApi(url, "GET", undefined, undefined, (data) =>
-                resolve(this._findArr(data)), reject));
-    }
-    // Convert unknown data type to string[]
-    private _findArr(data: object): string[] {
-        const inputs: IDictionaryStringTo<string> = VSS.getConfiguration().witInputs;
-        const property: string = inputs.Property;
-        if (property && property[0] === "$") {
-            return JSONPath.query(data, property);
-        }
-        // Look for an array: object itself or one of its properties
-        const objs: object[] = [data];
-        for (let obj = objs.shift(); obj; obj = objs.shift()) {
-            if (Array.isArray(obj)) {
-                // If configuration has a the Property property set then map from objects to strings
-                // Otherwise assume already strings
-                return property ? obj.map((o) => o[property]) : obj;
-            } else if (typeof obj === "object") {
-                for (const key in obj) {
-                    objs.push(obj[key]);
-                }
-            }
-        }
-        return [];
     }
 }

@@ -39,6 +39,7 @@ module.exports = {
             }
         ]
     },
+    mode: "development",
     plugins: [
         // new UglifyJSPlugin({
         //     compress: {

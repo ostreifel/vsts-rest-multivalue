@@ -2,7 +2,7 @@
     "compilerOptions": {
         "module": "amd",
         "moduleResolution": "node",
-        "sourceMap": false,
+        "sourceMap": true,
         "target": "es5",
         "strictNullChecks": true,
         "noUnusedLocals": true,

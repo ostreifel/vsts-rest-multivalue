@@ -24,8 +24,12 @@ export class MultiValueCombo {
         />, document.getElementById("container"), this._resize.bind(this));
     }
 
-    private async _resize() {
-        VSS.resize();
+    private async _resize(dropdown?: "show drowndown") {
+        if (dropdown) {
+            VSS.resize(undefined, ($(".container").height() || 36) + 35 * 6);
+        } else {
+            VSS.resize();
+        }
     }
 
     private async _getSelected(): Promise<ITag[]> {
@@ -34,7 +38,7 @@ export class MultiValueCombo {
         if (typeof value !== "string") {
             return [];
         }
-        return value.split(";").map((name) => ({name, key: name}));
+        return value.split(";").filter((v) => !!v).map((name) => ({name, key: name}));
     }
     private async _setSelected(values: ITag[]) {
         const formService = await WorkItemFormService.getService();
@@ -43,6 +47,7 @@ export class MultiValueCombo {
     }
 
     private async _searchValues(filter: string, selected?: ITag[]) {
+        this._resize("show drowndown");
         filter = filter.toLowerCase();
         const selectedSet: {[name: string]: boolean} = {};
         for (const {name} of selected || []) {
@@ -51,10 +56,11 @@ export class MultiValueCombo {
         const values = await this._getSuggestedValues();
 
         const lower = (v: string) => v.toLocaleLowerCase();
-        return [
+        const suggested = [
             ...values.filter((v) => lower(v).indexOf(filter) === 0).filter((v) => !selectedSet.hasOwnProperty(v)),
             ...values.filter((v) => lower(v).indexOf(filter) > 0).filter((v) => !selectedSet.hasOwnProperty(v)),
-        ];
+        ].map((name) => ({name, key: name}));
+        return suggested;
     }
 
     private async _getSuggestedValues(): Promise<string[]> {

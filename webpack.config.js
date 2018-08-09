@@ -6,7 +6,7 @@ var CopyWebpackPlugin = require('copy-webpack-plugin');
 module.exports = {
     target: "web",
     entry: {
-        app: "./src/app.ts"
+        registerMultiValue: "./src/registerMultiValue.ts"
     },
     output: {
         filename: "src/[name].js",
@@ -28,14 +28,14 @@ module.exports = {
         moduleExtensions: ["-loader"],
     },
     module: {
-        loaders: [
+        rules: [
             {
                 test: /\.tsx?$/,
-                loader: "ts-loader"
+                use: "ts-loader"
             },
             {
                 test: /\.s?css$/,
-                loaders: ["style-loader", "css-loader"]
+                use: ["style-loader", "css-loader"]
             }
         ]
     },
@@ -50,7 +50,7 @@ module.exports = {
         // }),
         new CopyWebpackPlugin([
             { from: "./node_modules/vss-web-extension-sdk/lib/VSS.SDK.min.js", to: "libs/VSS.SDK.min.js" },
-            { from: "./src/index.html", to: "./" },
+            { from: "./src/multivalue.html", to: "./" },
             { from: "./src/multi-selection.css", to: "./" },
             { from: "./img", to: "img" },
             { from: "./readme.md", to: "readme.md" }

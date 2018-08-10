@@ -1,8 +1,8 @@
-import {
-    ComboBox, IComboBoxOption,
-} from "office-ui-fabric-react/lib/components/ComboBox";
+import { Checkbox } from "office-ui-fabric-react/lib/components/Checkbox";
 import { ITag, TagPicker } from "office-ui-fabric-react/lib/components/pickers";
+import { TextField } from "office-ui-fabric-react/lib/components/TextField";
 import * as React from "react";
+import { DelayedFunction } from "VSS/Utils/Core";
 
 interface IMultiValueControlProps {
     selected?: string[];
@@ -15,35 +15,43 @@ interface IMultiValueControlProps {
     forceValue?: boolean;
     options: string[];
     onBlurred?: () => void;
-    onMenuOpen?: () => void;
+    onResize?: () => void;
 }
 
 interface IMultiValueControlState {
     focused: boolean;
+    idx: 0;
 }
 
 export class MultiValueControl extends React.Component<IMultiValueControlProps, IMultiValueControlState> {
-    private _comboBox: React.RefObject<ComboBox> = React.createRef<ComboBox>();
+    private _setUnfocused = new DelayedFunction(null, 1, "", () => {
+        this.setState({focused: false, idx: 0});
+    });
     constructor(props, context) {
         super(props, context);
-        this.state = { focused: false };
+        this.state = { focused: false, idx: 0 };
     }
     public render() {
-        console.log("rendering", this.props, this.state);
         if (this.state.focused) {
-            return <ComboBox
-                allowFreeform
-                multiSelect
-                ref={this._comboBox}
-                className="multi-value-control combo-box"
-                options={this._getOptions()}
-                selectedKey={this.props.selected}
-                onBlur={this._onBlur}
-                onMenuDismissed={this._showDropdown}
-                onMenuOpen={this.props.onMenuOpen}
-                dropdownWidth={this.props.width}
-                onChanged={this._onChanged}
-            />;
+            const options = this.props.options;
+            const selected = this.props.selected || [];
+            const {idx} = this.state;
+            return <div className="multi-value-control options">
+                <TextField value={selected.join(";") + (selected.length > 0 ? ";" : "")}
+                    autoFocus
+                    onBlur={this._onBlur}
+                    onFocus={this._onFocus}
+                />
+                {options.map((o, i) => <Checkbox
+                    className={`${i === idx || (i + 1 === options.length && idx > options.length) ? "hover" : ""}`}
+                    checked={selected.indexOf(o) >= 0}
+                    inputProps={{
+                        onBlur: this._onBlur,
+                        onFocus: this._onFocus,
+                    }}
+                    label={o}
+                />)}
+            </div>;
         } else {
             return <TagPicker
                 className="multi-value-control tag-picker"
@@ -59,58 +67,21 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
             />;
         }
     }
-    public componentDidUpdate(prevProps: IMultiValueControlProps, state: IMultiValueControlState) {
-        if (this.state.focused && !state.focused && this._comboBox.current) {
-            this._showDropdown();
+    public componentDidUpdate() {
+        if (this.props.onResize) {
+            this.props.onResize();
         }
     }
     private _onBlur = () => {
-        if (this.props.onBlurred) {
-            this.props.onBlurred();
-        }
-        this.setState({focused: false});
+        this._setUnfocused.reset();
     }
-    private _showDropdown = () => {
-        (document.querySelector("#container input") as HTMLInputElement)
-        .dispatchEvent(new KeyboardEvent("keydown", {
-            altKey: true,
-            bubbles: true,
-            keyCode: 40,
-        } as any));
+    private _onFocus = () => {
+        this._setUnfocused.cancel();
     }
     private _onTagsChanged = (tags: ITag[]) => {
         const values = tags.map(({name}) => name);
         if (this.props.onSelectionChanged) {
             this.props.onSelectionChanged(values);
         }
-    }
-    private _onChanged = (option: IComboBoxOption, _index: number, value: string) => {
-        if (option !== undefined) {
-            const selectedKeys = [...(this.props.selected || [])];
-            if (selectedKeys && option) {
-            const index = selectedKeys.indexOf(option.key as string);
-            if (option.selected && index < 0) {
-              selectedKeys.push(option.key as string);
-            } else {
-              selectedKeys.splice(index, 1);
-            }
-            if (this.props.onSelectionChanged) {
-                this.props.onSelectionChanged(selectedKeys);
-            }
-          }
-        }
-    }
-    private _getOptions = (): IComboBoxOption[] => {
-        const values = this.props.options;
-        const selected: { [key: string]: boolean } = {};
-        for (const v of this.props.selected || []) {
-            selected[v] = true;
-        }
-
-        return values.map((v) => ({
-            key: v,
-            text: v,
-            selected: !!selected[v],
-        }));
     }
 }

@@ -1,13 +1,10 @@
-html {
-    height: 100%;
-}
-body.multi-body {
-    height: 100%;
-}
-
 #container .tag-picker [role=list]:not(:hover) {
     border-color: transparent;
 }
-#container .multi-value-control.combo-box button {
-    visibility: hidden;
+#container .multi-value-control.options button {
+    width: 100%;
+}
+#container .multi-value-control.options button:hover,
+#container .multi-value-control.options button.hover {
+    background-color: aliceblue;
 }

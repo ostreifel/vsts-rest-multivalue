@@ -9,40 +9,17 @@ initializeIcons();
 export class MultiValueCombo {
     public readonly fieldName = VSS.getConfiguration().witInputs.FieldName;
     private readonly _container = document.getElementById("container") as HTMLElement;
-    private _dropdown: number;
 
     public async refresh(): Promise<void> {
         const selected = await this._getSelected();
         ReactDOM.render(<MultiValueControl
             selected={selected}
-            options={await this._searchValues("", [])}
+            options={await searchValues("", [])}
             onSelectionChanged={this._setSelected}
             width={this._container.scrollWidth}
             placeholder={selected.length ? "" : "No selection made"}
-            onBlurred={() => {
-                console.log("dismiss");
-                this._resize();
-            }}
-            onMenuOpen={() => this._resize(6)}
-        />, this._container);
-    }
-
-    private async _searchValues(filter: string, selected?: string[]): Promise<string[]> {
-        console.log("search values", filter);
-        if (!this._dropdown) {
-            this._resize(3);
-        }
-
-        const vals = await searchValues(filter, selected);
-        this._resize(vals.length);
-
-        return vals;
-    }
-
-    private async _resize(dropdown?: number) {
-        console.log("resize", dropdown);
-        this._dropdown = dropdown || 0;
-        VSS.resize(undefined, (this._container.scrollHeight || 36) + 30 + 40 * this._dropdown);
+            onResize={() => VSS.resize()}
+        />, this._container, () => VSS.resize());
     }
 
     private async _getSelected(): Promise<string[]> {

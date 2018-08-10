@@ -143,6 +143,7 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
             e.preventDefault();
             e.stopPropagation();
             break;
+            case 32: // space
             case 13: // enter
             const opts = this._filteredOptions();
             if (opts.length > 0) {
@@ -164,8 +165,6 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
                     selectionStart: pos,
                 } = input;
                 if (value.charAt(pos - 1) === ";") {
-                    e.preventDefault();
-                    e.stopPropagation();
                     const before = value.substr(0, pos - 1);
                     const after = value.substr(pos);
                     if (!after) {
@@ -173,7 +172,8 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
                         const filter = items.pop() as string;
                         await this._setSelected(items);
                         this.setState({filter});
-                        return;
+                        e.preventDefault();
+                        e.stopPropagation();
                     }
                 }
             }

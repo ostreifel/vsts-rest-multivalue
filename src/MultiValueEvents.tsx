@@ -18,7 +18,7 @@ export class MultiValueCombo {
             options={await getSuggestedValues()}
             onSelectionChanged={this._setSelected}
             width={this._container.scrollWidth}
-            placeholder={selected.length ? "" : "No selection made"}
+            placeholder={selected.length ? "Click to Add" : "No selection made"}
             onResize={() => VSS.resize()}
         />, this._container, () => {
             VSS.resize();

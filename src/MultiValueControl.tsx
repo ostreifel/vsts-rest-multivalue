@@ -36,7 +36,7 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
         if (this.state.focused) {
             const options = this.props.options;
             const selected = (this.props.selected || []).slice(0);
-            const {idx} = this.state;
+            const filteredOpts = this._filteredOptions();
             console.log("render", this.props, this.state);
             return <div className="multi-value-control options">
                 <TextField value={selected.join(";") + (selected.length > 0 ? ";" : "") + this.state.filter}
@@ -46,9 +46,20 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
                     onKeyDown={this._onInputKeyDown}
                     onChange={this._onInputChange}
                 />
-                {this._filteredOptions()
+                {this.state.filter ? null :
+                <Checkbox
+                    label="Select All"
+                    checked={selected.join(";") === options.join(";")}
+                    className={this.state.idx === 0 ? "hover" : ""}
+                    onChange={this._toggleSelectAll}
+                    inputProps={{
+                        onBlur: this._onBlur,
+                        onFocus: this._onFocus,
+                    }}
+                />}
+                {filteredOpts
                 .map((o, i) => <Checkbox
-                    className={`${i === idx || (i + 1 === options.length && idx > options.length) ? "hover" : ""}`}
+                    className={this._getOptionClass(i, filteredOpts)}
                     checked={selected.indexOf(o) >= 0}
                     inputProps={{
                         onBlur: this._onBlur,
@@ -78,6 +89,27 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
             this.props.onResize();
         }
     }
+    private _getOptionClass = (i: number, filteredOpts: string[]): string => {
+        const {idx, filter} = this.state;
+        if (!filter) {
+            i++;
+        }
+        const max = filter ? filteredOpts.length - 1 : filteredOpts.length;
+
+        if (i === idx || (i === max && idx > max)) {
+            return "hover";
+        }
+        return "";
+    }
+    private _toggleSelectAll = () => {
+        const options = this.props.options;
+        const selected = this.props.selected || [];
+        if (selected.join(";") === options.join(";")) {
+            this._setSelected([]);
+        } else {
+            this._setSelected(options);
+        }
+    }
     private _filteredOptions = () => {
         const filter = this.state.filter.toLocaleLowerCase();
         const opts = this.props.options;
@@ -99,7 +131,7 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
             e.stopPropagation();
             break;
             case 40: // down
-            if (this.state.idx + 1 < this.props.options.length) {
+            if (this.state.idx + 1 < this.props.options.length + (this.state.filter ? 0 : 1)) {
                 this.setState({idx: this.state.idx + 1});
             }
             e.preventDefault();
@@ -108,7 +140,10 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
             case 13: // enter
             const opts = this._filteredOptions();
             if (opts.length > 0) {
-                if (this._toggleOption(opts[Math.min(this.state.idx, opts.length - 1)])) {
+                let idx = this.state.idx;
+                if (!this.state.filter && idx-- === 0) {
+                    this._toggleSelectAll();
+                } else if (this._toggleOption(opts[Math.min(idx, opts.length - 1)])) {
                     this.setState({filter: ""});
                 }
             }

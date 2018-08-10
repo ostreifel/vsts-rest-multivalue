@@ -142,6 +142,7 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
     private _onInputChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
         if (!newValue) {
             this._setSelected([]);
+            this.setState({filter: ""});
             return;
         }
         const optionsMap: {[k: string]: boolean} = {};

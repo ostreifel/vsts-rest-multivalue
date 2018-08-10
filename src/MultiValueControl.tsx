@@ -21,12 +21,12 @@ interface IMultiValueControlProps {
 interface IMultiValueControlState {
     focused: boolean;
     idx: number;
-    filter: "";
+    filter: string;
 }
 
 export class MultiValueControl extends React.Component<IMultiValueControlProps, IMultiValueControlState> {
     private _setUnfocused = new DelayedFunction(null, 1, "", () => {
-        this.setState({focused: false, idx: 0});
+        this.setState({focused: false, idx: 0, filter: ""});
     });
     constructor(props, context) {
         super(props, context);
@@ -38,13 +38,15 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
             const selected = this.props.selected || [];
             const {idx} = this.state;
             return <div className="multi-value-control options">
-                <TextField value={selected.join(";") + (selected.length > 0 ? ";" : "")}
+                <TextField value={selected.join(";") + (selected.length > 0 ? ";" : "") + this.state.filter}
                     autoFocus
                     onBlur={this._onBlur}
                     onFocus={this._onFocus}
                     onKeyDown={this._onInputKeyDown}
+                    onChange={this._onInputChange}
                 />
-                {options.map((o, i) => <Checkbox
+                {this._filteredOptions()
+                .map((o, i) => <Checkbox
                     className={`${i === idx || (i + 1 === options.length && idx > options.length) ? "hover" : ""}`}
                     checked={selected.indexOf(o) >= 0}
                     inputProps={{
@@ -75,6 +77,12 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
             this.props.onResize();
         }
     }
+    private _filteredOptions = () => {
+        const filter = this.state.filter.toLocaleLowerCase();
+        return this.props.options.filter(
+            (o) => o.toLocaleLowerCase().indexOf(filter) >= 0,
+        );
+    }
     private _onInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.shiftKey || e.altKey || e.ctrlKey) {
             return;
@@ -95,12 +103,29 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
             e.stopPropagation();
             break;
             case 13: // enter
-            const opts = this.props.options;
+            const opts = this._filteredOptions();
             if (opts.length > 0) {
-                this._toggleOption(opts[Math.min(this.state.idx, opts.length - 1)]);
+                if (this._toggleOption(opts[Math.min(this.state.idx, opts.length - 1)])) {
+                    this.setState({filter: ""});
+                }
             }
             break;
         }
+    }
+    private _onInputChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
+        if (!newValue) {
+            this._setSelected([]);
+            return;
+        }
+        const optionsMap: {[k: string]: boolean} = {};
+        for (const o of this.props.options) {
+            optionsMap[o] = true;
+        }
+        const inputOpts = newValue.split(";").map((s) => s.trim()).filter((s) => !!s);
+        const selected = inputOpts.filter((o) => optionsMap[o]);
+        this._setSelected(selected);
+        const [filter] = inputOpts.filter((o) => !optionsMap[o]).reverse();
+        this.setState({filter: filter || ""});
     }
     private _onBlur = () => {
         this._setUnfocused.reset();
@@ -108,17 +133,22 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
     private _onFocus = () => {
         this._setUnfocused.cancel();
     }
-    private _toggleOption = (option: string) => {
+    private _setSelected = (selected: string[]) => {
         if (!this.props.onSelectionChanged) {
             return;
         }
+        this.props.onSelectionChanged(selected);
+    }
+    private _toggleOption = (option: string): boolean => {
         const selectedMap: {[k: string]: boolean} = {};
         for (const s of this.props.selected || []) {
             selectedMap[s] = true;
         }
+        const change = option in selectedMap || this.props.options.indexOf(option) >= 0;
         selectedMap[option] = !selectedMap[option];
         const selected = this.props.options.filter((o) => selectedMap[o]);
-        this.props.onSelectionChanged(selected);
+        this._setSelected(selected);
+        return change;
     }
     private _onTagsChanged = (tags: ITag[]) => {
         const values = tags.map(({name}) => name);

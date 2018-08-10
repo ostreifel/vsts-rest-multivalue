@@ -2,8 +2,8 @@ import { initializeIcons } from "office-ui-fabric-react/lib/Icons";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { WorkItemFormService } from "TFS/WorkItemTracking/Services";
-import { MultiValueControl } from "./MultiValueControl";
 import { getSuggestedValues } from "./getSuggestedValues";
+import { MultiValueControl } from "./MultiValueControl";
 
 initializeIcons();
 export class MultiValueCombo {
@@ -14,7 +14,7 @@ export class MultiValueCombo {
         const selected = await this._getSelected();
         ReactDOM.render(<MultiValueControl
             selected={selected}
-            options={await getSuggestedValues("", [])}
+            options={await getSuggestedValues()}
             onSelectionChanged={this._setSelected}
             width={this._container.scrollWidth}
             placeholder={selected.length ? "" : "No selection made"}

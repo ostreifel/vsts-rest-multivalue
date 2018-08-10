@@ -9,13 +9,14 @@
     "package:release": "node ./scripts/packageRelease",
     "package:beta": "node ./scripts/packageBeta",
     "publish:dev": "npm run package:dev && node ./scripts/publishDev",
-    "build:dev": "npm run clean && mkdir dist && webpack --progress --colors --output-path ./dist -p",
-    "build:release": "npm run clean && mkdir dist && webpack --progress --colors --output-path ./dist",
+    "build:dev": "npm run clean && mkdir dist && webpack --progress --colors --output-path ./dist",
+    "build:release": "npm run clean && mkdir dist && webpack --progress --colors --output-path ./dist -p",
     "publish:release": "npm run build:release && node ./scripts/publishRelease",
     "test": "karma start --single-run",
     "postinstall": "typings install"
   },
   "devDependencies": {
+    "@types/applicationinsights-js": "^1.0.5",
     "@types/jquery": "^2.0.41",
     "@types/jsonpath": "^0.2.0",
     "@types/react": "^16.4.8",

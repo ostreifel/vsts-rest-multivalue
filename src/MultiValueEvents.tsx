@@ -2,6 +2,7 @@ import { initializeIcons } from "office-ui-fabric-react/lib/Icons";
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { WorkItemFormService } from "TFS/WorkItemTracking/Services";
+import { trackEvent } from "./events";
 import { getSuggestedValues } from "./getSuggestedValues";
 import { MultiValueControl } from "./MultiValueControl";
 
@@ -13,6 +14,9 @@ export class MultiValueCombo {
 
     public async refresh(): Promise<void> {
         const selected = await this._getSelected();
+        trackEvent("refresh", {
+            usesJsonPath: ((VSS.getConfiguration().witInputs.Property || "")[0] === "$") + "",
+        });
         ReactDOM.render(<MultiValueControl
             selected={selected}
             options={await getSuggestedValues()}
@@ -37,11 +41,12 @@ export class MultiValueCombo {
         return value.split(";").filter((v) => !!v);
     }
     private _setSelected = async (values: string[]): Promise<void> => {
+        trackEvent("update");
         const formService = await WorkItemFormService.getService();
         const text = values.map((name) => name).join(";");
         formService.setFieldValue(this.fieldName, text);
         return new Promise<void>((resolve) => {
             this._onRefreshed = resolve;
-        })
+        });
     }
 }

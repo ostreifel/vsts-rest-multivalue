@@ -24,8 +24,7 @@ function makeUnique(vals: string[]): string[] {
 }
 // Convert unknown data type to string[]
 function _findArr(data: object): string[] {
-    const inputs: IDictionaryStringTo<string> = VSS.getConfiguration().witInputs;
-    const property: string = inputs.Property;
+    const property: string = VSS.getConfiguration().witInputs.Property;
     if (property && property[0] === "$") {
         return JSONPath.query(data, property);
     }

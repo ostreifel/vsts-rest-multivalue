@@ -8,3 +8,6 @@
 #container .multi-value-control.options button.hover {
     background-color: aliceblue;
 }
+#container .multi-value-control.options .checkboxes {
+    padding: 0 2px;
+}

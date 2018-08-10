@@ -1,6 +1,7 @@
 import { Checkbox } from "office-ui-fabric-react/lib/components/Checkbox";
 import { ITag, TagPicker } from "office-ui-fabric-react/lib/components/pickers";
 import { TextField } from "office-ui-fabric-react/lib/components/TextField";
+import { FocusZone, FocusZoneDirection } from "office-ui-fabric-react/lib/FocusZone";
 import * as React from "react";
 import { DelayedFunction } from "VSS/Utils/Core";
 
@@ -46,28 +47,33 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
                     onKeyDown={this._onInputKeyDown}
                     onChange={this._onInputChange}
                 />
-                {this.state.filter ? null :
-                <Checkbox
-                    label="Select All"
-                    checked={selected.join(";") === options.join(";")}
-                    className={this.state.idx === 0 ? "hover" : ""}
-                    onChange={this._toggleSelectAll}
-                    inputProps={{
-                        onBlur: this._onBlur,
-                        onFocus: this._onFocus,
-                    }}
-                />}
-                {filteredOpts
-                .map((o, i) => <Checkbox
-                    className={this._getOptionClass(i, filteredOpts)}
-                    checked={selected.indexOf(o) >= 0}
-                    inputProps={{
-                        onBlur: this._onBlur,
-                        onFocus: this._onFocus,
-                    }}
-                    onChange={() => this._toggleOption(o)}
-                    label={o}
-                />)}
+                <FocusZone
+                    direction={FocusZoneDirection.vertical}
+                    className="checkboxes"
+                >
+                    {this.state.filter ? null :
+                    <Checkbox
+                        label="Select All"
+                        checked={selected.join(";") === options.join(";")}
+                        className={this.state.idx === 0 ? "hover" : ""}
+                        onChange={this._toggleSelectAll}
+                        inputProps={{
+                            onBlur: this._onBlur,
+                            onFocus: this._onFocus,
+                        }}
+                    />}
+                    {filteredOpts
+                    .map((o, i) => <Checkbox
+                        className={this._getOptionClass(i, filteredOpts)}
+                        checked={selected.indexOf(o) >= 0}
+                        inputProps={{
+                            onBlur: this._onBlur,
+                            onFocus: this._onFocus,
+                        }}
+                        onChange={() => this._toggleOption(o)}
+                        label={o}
+                    />)}
+                </FocusZone>
             </div>;
         } else {
             return <TagPicker

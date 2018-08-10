@@ -3,7 +3,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import { WorkItemFormService } from "TFS/WorkItemTracking/Services";
 import { MultiValueControl } from "./MultiValueControl";
-import { searchValues } from "./searchValues";
+import { getSuggestedValues } from "./getSuggestedValues";
 
 initializeIcons();
 export class MultiValueCombo {
@@ -14,7 +14,7 @@ export class MultiValueCombo {
         const selected = await this._getSelected();
         ReactDOM.render(<MultiValueControl
             selected={selected}
-            options={await searchValues("", [])}
+            options={await getSuggestedValues("", [])}
             onSelectionChanged={this._setSelected}
             width={this._container.scrollWidth}
             placeholder={selected.length ? "" : "No selection made"}

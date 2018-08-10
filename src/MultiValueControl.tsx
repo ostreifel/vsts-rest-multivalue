@@ -21,6 +21,7 @@ interface IMultiValueControlProps {
 interface IMultiValueControlState {
     focused: boolean;
     idx: number;
+    filter: "";
 }
 
 export class MultiValueControl extends React.Component<IMultiValueControlProps, IMultiValueControlState> {
@@ -29,7 +30,7 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
     });
     constructor(props, context) {
         super(props, context);
-        this.state = { focused: false, idx: 0 };
+        this.state = { focused: false, idx: 0, filter: "" };
     }
     public render() {
         if (this.state.focused) {

@@ -12,7 +12,6 @@ $(window).bind("keydown", (event: JQueryEventObject) => {
     }
 });
 
-
 const provider = () => {
     let control: MultiValueCombo;
 

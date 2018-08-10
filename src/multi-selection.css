@@ -8,3 +8,6 @@ body.multi-body {
 #container .tag-picker [role=list]:not(:hover) {
     border-color: transparent;
 }
+#container .multi-value-control.combo-box button {
+    visibility: hidden;
+}

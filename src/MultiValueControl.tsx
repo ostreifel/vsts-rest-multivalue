@@ -39,7 +39,7 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
                 options={this._getOptions()}
                 selectedKey={this.props.selected}
                 onBlur={this._onBlur}
-                onMenuDismissed={this._onDismissed}
+                onMenuDismissed={this._showDropdown}
                 onMenuOpen={this.props.onMenuOpen}
                 dropdownWidth={this.props.width}
                 onChanged={this._onChanged}
@@ -61,9 +61,7 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
     }
     public componentDidUpdate(prevProps: IMultiValueControlProps, state: IMultiValueControlState) {
         if (this.state.focused && !state.focused && this._comboBox.current) {
-            console.log("combo", this._comboBox.current.focus, this._comboBox.current);
-            const input = (document.querySelector("#container input") as HTMLInputElement);
-            $(input).click();
+            this._showDropdown();
         }
     }
     private _onBlur = () => {
@@ -72,8 +70,13 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
         }
         this.setState({focused: false});
     }
-    private _onDismissed = () => {
-        (document.querySelector("#container input") as HTMLInputElement).click();
+    private _showDropdown = () => {
+        (document.querySelector("#container input") as HTMLInputElement)
+        .dispatchEvent(new KeyboardEvent("keydown", {
+            altKey: true,
+            bubbles: true,
+            keyCode: 40,
+        } as any));
     }
     private _onTagsChanged = (tags: ITag[]) => {
         const values = tags.map(({name}) => name);

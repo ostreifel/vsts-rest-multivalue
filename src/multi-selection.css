@@ -1,3 +1,9 @@
+html {
+    height: 100%;
+}
+body.multi-body {
+    height: 100%;
+}
 .container {
     border: 1px transparent solid;
     margin-right: 4px;

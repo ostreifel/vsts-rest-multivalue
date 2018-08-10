@@ -1,12 +1,11 @@
 import * as JSONPath from "jsonpath";
-import { ITag } from "office-ui-fabric-react/lib/components/pickers/TagPicker/TagPicker";
 import { callApi } from "./RestCall";
 
 let _suggestedValues: Promise<string[]>;
-export async function searchValues(filter: string, selected?: ITag[]): Promise<ITag[]> {
+export async function searchValues(filter: string, selected?: string[]): Promise<string[]> {
     filter = filter.toLowerCase();
     const selectedSet: {[name: string]: boolean} = {};
-    for (const {name} of selected || []) {
+    for (const name of selected || []) {
         selectedSet[name] = true;
     }
     const values = await _getSuggestedValues();
@@ -14,7 +13,7 @@ export async function searchValues(filter: string, selected?: ITag[]): Promise<I
     const lower = (v: string) => v.toLocaleLowerCase();
     const suggested = [
         ...values.filter((v) => lower(v).indexOf(filter) >= 0).filter((v) => !selectedSet.hasOwnProperty(v)),
-    ].map((name) => ({name, key: name}));
+    ];
     return suggested;
 }
 

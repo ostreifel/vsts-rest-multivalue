@@ -1,6 +1,6 @@
 import * as WitExtensionContracts from "TFS/WorkItemTracking/ExtensionContracts";
 import { WorkItemFormService } from "TFS/WorkItemTracking/Services";
-import { MultiValueCombo } from "./MultiValueCombo";
+import { MultiValueCombo } from "./MultiValueEvents";
 
 // save on ctr + s
 $(window).bind("keydown", (event: JQueryEventObject) => {

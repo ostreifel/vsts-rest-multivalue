@@ -11,7 +11,7 @@ interface IMultiValueControlProps {
     placeholder?: string;
     noResultsFoundText?: string;
     searchingText?: string;
-    onSelectionChanged?: (selection: string[]) => void;
+    onSelectionChanged?: (selection: string[]) => Promise<void>;
     forceValue?: boolean;
     options: string[];
     onBlurred?: () => void;
@@ -35,8 +35,9 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
     public render() {
         if (this.state.focused) {
             const options = this.props.options;
-            const selected = this.props.selected || [];
+            const selected = (this.props.selected || []).slice(0);
             const {idx} = this.state;
+            console.log("render", this.props, this.state);
             return <div className="multi-value-control options">
                 <TextField value={selected.join(";") + (selected.length > 0 ? ";" : "") + this.state.filter}
                     autoFocus
@@ -85,7 +86,7 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
             ...opts.filter((o) => o.toLocaleLowerCase().indexOf(filter) > 0),
         ];
     }
-    private _onInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    private _onInputKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.shiftKey || e.altKey || e.ctrlKey) {
             return;
         }
@@ -109,6 +110,30 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
             if (opts.length > 0) {
                 if (this._toggleOption(opts[Math.min(this.state.idx, opts.length - 1)])) {
                     this.setState({filter: ""});
+                }
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+            case 8: // backspace
+            const input = e.target as HTMLInputElement;
+            if (typeof input.selectionStart === "number" && input.selectionStart === input.selectionEnd) {
+                const {
+                    value,
+                    selectionStart: pos,
+                } = input;
+                if (value.charAt(pos - 1) === ";") {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const before = value.substr(0, pos - 1);
+                    const after = value.substr(pos);
+                    if (!after) {
+                        const items = before.split(";");
+                        const filter = items.pop() as string;
+                        await this._setSelected(items);
+                        this.setState({filter});
+                        return;
+                    }
                 }
             }
             break;
@@ -135,11 +160,11 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
     private _onFocus = () => {
         this._setUnfocused.cancel();
     }
-    private _setSelected = (selected: string[]) => {
+    private _setSelected = async (selected: string[]): Promise<void> => {
         if (!this.props.onSelectionChanged) {
             return;
         }
-        this.props.onSelectionChanged(selected);
+        await this.props.onSelectionChanged(selected);
     }
     private _toggleOption = (option: string): boolean => {
         const selectedMap: {[k: string]: boolean} = {};

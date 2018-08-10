@@ -9,6 +9,7 @@ initializeIcons();
 export class MultiValueCombo {
     public readonly fieldName = VSS.getConfiguration().witInputs.FieldName;
     private readonly _container = document.getElementById("container") as HTMLElement;
+    private _onRefreshed: () => void;
 
     public async refresh(): Promise<void> {
         const selected = await this._getSelected();
@@ -19,7 +20,12 @@ export class MultiValueCombo {
             width={this._container.scrollWidth}
             placeholder={selected.length ? "" : "No selection made"}
             onResize={() => VSS.resize()}
-        />, this._container, () => VSS.resize());
+        />, this._container, () => {
+            VSS.resize();
+            if (this._onRefreshed) {
+                this._onRefreshed();
+            }
+        });
     }
 
     private async _getSelected(): Promise<string[]> {
@@ -30,9 +36,12 @@ export class MultiValueCombo {
         }
         return value.split(";").filter((v) => !!v);
     }
-    private _setSelected = async (values: string[]) => {
+    private _setSelected = async (values: string[]): Promise<void> => {
         const formService = await WorkItemFormService.getService();
         const text = values.map((name) => name).join(";");
         formService.setFieldValue(this.fieldName, text);
+        return new Promise<void>((resolve) => {
+            this._onRefreshed = resolve;
+        })
     }
 }

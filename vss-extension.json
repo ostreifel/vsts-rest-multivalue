@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1.0,
     "id": "vsts-rest-multivalue-control",
-    "version": "1.0.138",
+    "version": "1.0.142",
     "name": "Rest Multivalue Control",
     "description": "A work item form control which allows selection of multiple values from rest apis.",
     "publisher": "ottostreifel",

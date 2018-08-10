@@ -20,7 +20,7 @@ interface IMultiValueControlProps {
 
 interface IMultiValueControlState {
     focused: boolean;
-    idx: 0;
+    idx: number;
 }
 
 export class MultiValueControl extends React.Component<IMultiValueControlProps, IMultiValueControlState> {
@@ -41,6 +41,7 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
                     autoFocus
                     onBlur={this._onBlur}
                     onFocus={this._onFocus}
+                    onKeyDown={this._onInputKeyDown}
                 />
                 {options.map((o, i) => <Checkbox
                     className={`${i === idx || (i + 1 === options.length && idx > options.length) ? "hover" : ""}`}
@@ -49,6 +50,7 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
                         onBlur: this._onBlur,
                         onFocus: this._onFocus,
                     }}
+                    onChange={() => this._toggleOption(o)}
                     label={o}
                 />)}
             </div>;
@@ -72,11 +74,50 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
             this.props.onResize();
         }
     }
+    private _onInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.shiftKey || e.altKey || e.ctrlKey) {
+            return;
+        }
+        switch (e.which) {
+            case 38: // up
+            if (this.state.idx > 0) {
+                this.setState({idx: this.state.idx - 1});
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+            case 40: // down
+            if (this.state.idx + 1 < this.props.options.length) {
+                this.setState({idx: this.state.idx + 1});
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            break;
+            case 13: // enter
+            const opts = this.props.options;
+            if (opts.length > 0) {
+                this._toggleOption(opts[Math.min(this.state.idx, opts.length - 1)]);
+            }
+            break;
+        }
+    }
     private _onBlur = () => {
         this._setUnfocused.reset();
     }
     private _onFocus = () => {
         this._setUnfocused.cancel();
+    }
+    private _toggleOption = (option: string) => {
+        if (!this.props.onSelectionChanged) {
+            return;
+        }
+        const selectedMap: {[k: string]: boolean} = {};
+        for (const s of this.props.selected || []) {
+            selectedMap[s] = true;
+        }
+        selectedMap[option] = !selectedMap[option];
+        const selected = this.props.options.filter((o) => selectedMap[o]);
+        this.props.onSelectionChanged(selected);
     }
     private _onTagsChanged = (tags: ITag[]) => {
         const values = tags.map(({name}) => name);

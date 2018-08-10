@@ -79,9 +79,11 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
     }
     private _filteredOptions = () => {
         const filter = this.state.filter.toLocaleLowerCase();
-        return this.props.options.filter(
-            (o) => o.toLocaleLowerCase().indexOf(filter) >= 0,
-        );
+        const opts = this.props.options;
+        return [
+            ...opts.filter((o) => o.toLocaleLowerCase().indexOf(filter) === 0),
+            ...opts.filter((o) => o.toLocaleLowerCase().indexOf(filter) > 0),
+        ];
     }
     private _onInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.shiftKey || e.altKey || e.ctrlKey) {

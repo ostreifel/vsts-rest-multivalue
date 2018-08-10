@@ -12,12 +12,13 @@ export class MultiValueCombo {
     private _dropdown: number;
 
     public async refresh(): Promise<void> {
+        const selected = await this._getSelected();
         ReactDOM.render(<MultiValueControl
-            selected={await this._getSelected()}
+            selected={selected}
             options={await this._searchValues("", [])}
-            onSelectionChanged={(selected) => this._setSelected(selected)}
+            onSelectionChanged={this._setSelected}
             width={this._container.scrollWidth}
-            placeholder="No selection made"
+            placeholder={selected.length ? "" : "No selection made"}
             onBlurred={() => {
                 console.log("dismiss");
                 this._resize();
@@ -52,7 +53,7 @@ export class MultiValueCombo {
         }
         return value.split(";").filter((v) => !!v);
     }
-    private async _setSelected(values: string[]) {
+    private _setSelected = async (values: string[]) => {
         const formService = await WorkItemFormService.getService();
         const text = values.map((name) => name).join(";");
         formService.setFieldValue(this.fieldName, text);

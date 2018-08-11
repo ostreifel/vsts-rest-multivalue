@@ -1,13 +1,15 @@
-#container .tag-picker [role=list]:not(:hover) {
+#container .multi-value-control .tag-picker [role=list]:not(:hover) {
     border-color: transparent;
 }
-#container .multi-value-control.options button {
+#container .multi-value-control.focused .tag-picker input {
+    display: none;
+}
+#container .multi-value-control .options button {
     width: 100%;
 }
-#container .multi-value-control.options button:hover,
-#container .multi-value-control.options button.hover {
+#container .multi-value-control .options button:hover {
     background-color: aliceblue;
 }
-#container .multi-value-control.options .checkboxes {
+#container .multi-value-control .options .checkboxes {
     padding: 0 3px 3px 3px;
 }

@@ -21,63 +21,23 @@ interface IMultiValueControlProps {
 
 interface IMultiValueControlState {
     focused: boolean;
-    idx: number;
     filter: string;
 }
 
 export class MultiValueControl extends React.Component<IMultiValueControlProps, IMultiValueControlState> {
-    private _setUnfocused = new DelayedFunction(null, 1, "", () => {
-        this.setState({focused: false, idx: 0, filter: ""});
+    private _setUnfocused = new DelayedFunction(null, 100, "", () => {
+        this.setState({focused: false, filter: ""});
     });
     constructor(props, context) {
         super(props, context);
-        this.state = { focused: false, idx: 0, filter: "" };
+        this.state = { focused: false, filter: "" };
     }
     public render() {
-        if (this.state.focused) {
-            const options = this.props.options;
-            const selected = (this.props.selected || []).slice(0);
-            const filteredOpts = this._filteredOptions();
-            console.log("render", this.props, this.state);
-            return <div className="multi-value-control options">
-                <TextField value={selected.join(";") + (selected.length > 0 ? ";" : "") + this.state.filter}
-                    autoFocus
-                    onBlur={this._onBlur}
-                    onFocus={this._onFocus}
-                    onKeyDown={this._onInputKeyDown}
-                    onChange={this._onInputChange}
-                />
-                <FocusZone
-                    direction={FocusZoneDirection.vertical}
-                    className="checkboxes"
-                >
-                    {this.state.filter ? null :
-                    <Checkbox
-                        label="Select All"
-                        checked={selected.join(";") === options.join(";")}
-                        className={this.state.idx === 0 ? "hover" : ""}
-                        onChange={this._toggleSelectAll}
-                        inputProps={{
-                            onBlur: this._onBlur,
-                            onFocus: this._onFocus,
-                        }}
-                    />}
-                    {filteredOpts
-                    .map((o, i) => <Checkbox
-                        className={this._getOptionClass(i, filteredOpts)}
-                        checked={selected.indexOf(o) >= 0}
-                        inputProps={{
-                            onBlur: this._onBlur,
-                            onFocus: this._onFocus,
-                        }}
-                        onChange={() => this._toggleOption(o)}
-                        label={o}
-                    />)}
-                </FocusZone>
-            </div>;
-        } else {
-            return <TagPicker
-                className="multi-value-control tag-picker"
+        console.log("render", this.props, this.state);
+        const {focused} = this.state;
+        return <div className={`multi-value-control ${focused ? "focused" : ""}`}>
+            <TagPicker
+                className="tag-picker"
                 selectedItems={(this.props.selected || []).map((t) => ({ key: t, name: t }))}
                 inputProps={{
                     placeholder: this.props.placeholder,
@@ -87,25 +47,55 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
                 }}
                 onChange={this._onTagsChanged}
                 onResolveSuggestions={() => []}
-            />;
-        }
+            />
+            {focused ? this._getOptions() : null}
+        </div>;
     }
     public componentDidUpdate() {
         if (this.props.onResize) {
+            console.log("resizing");
             this.props.onResize();
         }
     }
-    private _getOptionClass = (i: number, filteredOpts: string[]): string => {
-        const {idx, filter} = this.state;
-        if (!filter) {
-            i++;
-        }
-        const max = filter ? filteredOpts.length - 1 : filteredOpts.length;
+    private _getOptions() {
+        const options = this.props.options;
+        const selected = (this.props.selected || []).slice(0);
+        const filteredOpts = this._filteredOptions();
 
-        if (i === idx || (i === max && idx > max)) {
-            return "hover";
-        }
-        return "";
+        return <div className="options">
+            <TextField value={this.state.filter}
+                autoFocus
+                placeholder={"Filter values"}
+                onBlur={this._onBlur}
+                onFocus={this._onFocus}
+                onChange={this._onInputChange}
+            />
+            <FocusZone
+                direction={FocusZoneDirection.vertical}
+                className="checkboxes"
+            >
+                {this.state.filter ? null :
+                <Checkbox
+                    label="Select All"
+                    checked={selected.join(";") === options.join(";")}
+                    onChange={this._toggleSelectAll}
+                    inputProps={{
+                        onBlur: this._onBlur,
+                        onFocus: this._onFocus,
+                    }}
+                />}
+                {filteredOpts
+                .map((o) => <Checkbox
+                    checked={selected.indexOf(o) >= 0}
+                    inputProps={{
+                        onBlur: this._onBlur,
+                        onFocus: this._onFocus,
+                    }}
+                    onChange={() => this._toggleOption(o)}
+                    label={o}
+                />)}
+            </FocusZone>
+        </div>;
     }
     private _toggleSelectAll = () => {
         const options = this.props.options;
@@ -124,77 +114,8 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
             ...opts.filter((o) => o.toLocaleLowerCase().indexOf(filter) > 0),
         ];
     }
-    private _onInputKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.shiftKey || e.altKey || e.ctrlKey) {
-            return;
-        }
-        switch (e.which) {
-            case 38: // up
-            if (this.state.idx > 0) {
-                this.setState({idx: this.state.idx - 1});
-            }
-            e.preventDefault();
-            e.stopPropagation();
-            break;
-            case 40: // down
-            if (this.state.idx + 1 < this.props.options.length + (this.state.filter ? 0 : 1)) {
-                this.setState({idx: this.state.idx + 1});
-            }
-            e.preventDefault();
-            e.stopPropagation();
-            break;
-            case 32: // space
-            case 13: // enter
-            const opts = this._filteredOptions();
-            if (opts.length > 0) {
-                let idx = this.state.idx;
-                if (!this.state.filter && idx-- === 0) {
-                    this._toggleSelectAll();
-                } else if (this._toggleOption(opts[Math.min(idx, opts.length - 1)])) {
-                    this.setState({filter: ""});
-                }
-            }
-            e.preventDefault();
-            e.stopPropagation();
-            break;
-            case 8: // backspace
-            const input = e.target as HTMLInputElement;
-            if (typeof input.selectionStart === "number" && input.selectionStart === input.selectionEnd) {
-                const {
-                    value,
-                    selectionStart: pos,
-                } = input;
-                if (value.charAt(pos - 1) === ";") {
-                    const before = value.substr(0, pos - 1);
-                    const after = value.substr(pos);
-                    if (!after) {
-                        const items = before.split(";");
-                        const filter = items.pop() as string;
-                        await this._setSelected(items);
-                        this.setState({filter});
-                        e.preventDefault();
-                        e.stopPropagation();
-                    }
-                }
-            }
-            break;
-        }
-    }
     private _onInputChange = (event: React.FormEvent<HTMLInputElement | HTMLTextAreaElement>, newValue?: string) => {
-        if (!newValue) {
-            this._setSelected([]);
-            this.setState({filter: ""});
-            return;
-        }
-        const optionsMap: {[k: string]: boolean} = {};
-        for (const o of this.props.options) {
-            optionsMap[o] = true;
-        }
-        const inputOpts = newValue.split(";").map((s) => s.trim()).filter((s) => !!s);
-        const selected = inputOpts.filter((o) => optionsMap[o]);
-        this._setSelected(selected);
-        const [filter] = inputOpts.filter((o) => !optionsMap[o]).reverse();
-        this.setState({filter: filter || ""});
+        this.setState({filter: newValue || ""});
     }
     private _onBlur = () => {
         this._setUnfocused.reset();

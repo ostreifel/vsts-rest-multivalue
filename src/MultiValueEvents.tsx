@@ -11,12 +11,20 @@ export class MultiValueCombo {
     public readonly fieldName = VSS.getConfiguration().witInputs.FieldName;
     private readonly _container = document.getElementById("container") as HTMLElement;
     private _onRefreshed: () => void;
+    /** Counter to avoid consuming own changed field events. */
+    private _fired: number = 0;
 
-    public async refresh(): Promise<void> {
-        const selected = await this._getSelected();
-        trackEvent("refresh", {
+    public async refresh(selected?: string[]): Promise<void> {
+        trackEvent(selected ? "update" : "refresh", {
             usesJsonPath: ((VSS.getConfiguration().witInputs.Property || "")[0] === "$") + "",
         });
+        if (!selected) {
+            if (this._fired) {
+                this._fired--;
+                return;
+            }
+            selected = await this._getSelected();
+        }
         ReactDOM.render(<MultiValueControl
             selected={selected}
             options={await getSuggestedValues()}
@@ -41,10 +49,10 @@ export class MultiValueCombo {
         return value.split(";").filter((v) => !!v);
     }
     private _setSelected = async (values: string[]): Promise<void> => {
-        trackEvent("update");
+        this.refresh(values);
+        this._fired++;
         const formService = await WorkItemFormService.getService();
-        const text = values.map((name) => name).join(";");
-        formService.setFieldValue(this.fieldName, text);
+        formService.setFieldValue(this.fieldName, values.join(";"));
         return new Promise<void>((resolve) => {
             this._onRefreshed = resolve;
         });

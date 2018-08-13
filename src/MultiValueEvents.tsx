@@ -31,13 +31,17 @@ export class MultiValueCombo {
             onSelectionChanged={this._setSelected}
             width={this._container.scrollWidth}
             placeholder={selected.length ? "Click to Add" : "No selection made"}
-            onResize={() => VSS.resize()}
+            onResize={this._resize}
         />, this._container, () => {
-            VSS.resize();
+            this._resize();
             if (this._onRefreshed) {
                 this._onRefreshed();
             }
         });
+    }
+
+    private _resize = () => {
+        VSS.resize(this._container.scrollWidth, this._container.scrollHeight);
     }
 
     private async _getSelected(): Promise<string[]> {

@@ -4,6 +4,7 @@ import { TextField } from "office-ui-fabric-react/lib/components/TextField";
 import { FocusZone, FocusZoneDirection } from "office-ui-fabric-react/lib/FocusZone";
 import * as React from "react";
 import { DelayedFunction } from "VSS/Utils/Core";
+import { BrowserCheckUtils } from "VSS/Utils/UI";
 
 interface IMultiValueControlProps {
     selected?: string[];
@@ -25,7 +26,8 @@ interface IMultiValueControlState {
 }
 
 export class MultiValueControl extends React.Component<IMultiValueControlProps, IMultiValueControlState> {
-    private _setUnfocused = new DelayedFunction(null, 100, "", () => {
+    private readonly _unfocusedTimeout = BrowserCheckUtils.isSafari() ? 2000 : 1;
+    private _setUnfocused = new DelayedFunction(null, this._unfocusedTimeout, "", () => {
         this.setState({focused: false, filter: ""});
     });
     constructor(props, context) {
@@ -33,7 +35,6 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
         this.state = { focused: false, filter: "" };
     }
     public render() {
-        console.log("render", this.props, this.state);
         const {focused} = this.state;
         return <div className={`multi-value-control ${focused ? "focused" : ""}`}>
             <TagPicker
@@ -53,7 +54,6 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
     }
     public componentDidUpdate() {
         if (this.props.onResize) {
-            console.log("resizing");
             this.props.onResize();
         }
     }
@@ -105,6 +105,7 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
         } else {
             this._setSelected(options);
         }
+        this._ifSafariCloseDropdown();
     }
     private _filteredOptions = () => {
         const filter = this.state.filter.toLocaleLowerCase();
@@ -138,7 +139,13 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
         selectedMap[option] = !selectedMap[option];
         const selected = this.props.options.filter((o) => selectedMap[o]);
         this._setSelected(selected);
+        this._ifSafariCloseDropdown();
         return change;
+    }
+    private _ifSafariCloseDropdown() {
+        if (BrowserCheckUtils.isSafari()) {
+            this.setState({filter: "", focused: false});
+        }
     }
     private _onTagsChanged = (tags: ITag[]) => {
         const values = tags.map(({name}) => name);

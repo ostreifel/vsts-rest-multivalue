@@ -39,11 +39,9 @@ export class MultiValueCombo {
             }
         });
     }
-
     private _resize = () => {
         VSS.resize(this._container.scrollWidth, this._container.scrollHeight);
     }
-
     private async _getSelected(): Promise<string[]> {
         const formService = await WorkItemFormService.getService();
         const value = await formService.getFieldValue(this.fieldName);

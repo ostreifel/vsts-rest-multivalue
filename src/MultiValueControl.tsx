@@ -66,6 +66,7 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
             <TextField value={this.state.filter}
                 autoFocus
                 placeholder={"Filter values"}
+                onKeyDown={this._onInputKeyDown}
                 onBlur={this._onBlur}
                 onFocus={this._onFocus}
                 onChange={this._onInputChange}
@@ -96,6 +97,22 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
                 />)}
             </FocusZone>
         </div>;
+    }
+    private _onInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.altKey || e.shiftKey || e.ctrlKey) {
+            return;
+        }
+
+        if (e.keyCode === 13) {
+            const filtered = this._filteredOptions();
+            if (filtered.length !== 1) {
+                return;
+            }
+            e.preventDefault();
+            e.stopPropagation();
+            this._toggleOption(filtered[0]);
+            this.setState({filter: ""});
+        }
     }
     private _toggleSelectAll = () => {
         const options = this.props.options;

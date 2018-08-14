@@ -9,7 +9,9 @@
         "ban-types": false,
         "forin": false,
         "object-literal-sort-keys": false,
-        "no-angle-bracket-type-assertion": false
+        "no-angle-bracket-type-assertion": false,
+        "no-invalid-this": true,
+        "no-console": false
     },
     "rulesDirectory": []
 }

@@ -1,7 +1,7 @@
 {
     "manifestVersion": 1.0,
     "id": "vsts-rest-multivalue-control",
-    "version": "1.0.31",
+    "version": "1.0.195",
     "name": "Rest Multivalue Control",
     "description": "A work item form control which allows selection of multiple values from rest apis.",
     "publisher": "ottostreifel",
@@ -61,7 +61,7 @@
         "vso.test"
     ],
     "contributions": [
-		{
+        {
             "id": "multivalue-form-control",
             "type": "ms.vss-work-web.work-item-form-control",
             "description": "A work item form control which allows selection of multiple values.",
@@ -70,10 +70,10 @@
             ],
             "properties": {
                 "name": "Rest Multivalue control",
-                "uri": "dist/index.html",
+                "uri": "dist/multivalue.html",
                 "height": 50,
-				"inputs": [
-				    {
+                "inputs": [
+                    {
                         "id":"FieldName",
                         "name": "Select the field for this control. This is the only input needed if the field is a picklist field with suggested values.",
                         "type": "WorkItemField",
@@ -102,7 +102,7 @@
                             "isRequired": false
                         }
                     }
-				]
+                ]
             }
         }
     ]

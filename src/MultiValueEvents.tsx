@@ -7,7 +7,7 @@ import { getSuggestedValues } from "./getSuggestedValues";
 import { MultiValueControl } from "./MultiValueControl";
 
 initializeIcons();
-export class MultiValueCombo {
+export class MultiValueEvents {
     public readonly fieldName = VSS.getConfiguration().witInputs.FieldName;
     private readonly _container = document.getElementById("container") as HTMLElement;
     private _onRefreshed: () => void;

@@ -1,6 +1,6 @@
 import * as WitExtensionContracts from "TFS/WorkItemTracking/ExtensionContracts";
 import { WorkItemFormService } from "TFS/WorkItemTracking/Services";
-import { MultiValueCombo } from "./MultiValueEvents";
+import { MultiValueEvents } from "./MultiValueEvents";
 
 // save on ctr + s
 $(window).bind("keydown", (event: JQueryEventObject) => {
@@ -13,11 +13,11 @@ $(window).bind("keydown", (event: JQueryEventObject) => {
 });
 
 const provider = () => {
-    let control: MultiValueCombo;
+    let control: MultiValueEvents;
 
     const ensureControl = () => {
         if (!control) {
-            control = new MultiValueCombo();
+            control = new MultiValueEvents();
         }
         control.refresh();
     };

@@ -5,6 +5,7 @@ import { FocusZone, FocusZoneDirection } from "office-ui-fabric-react/lib/FocusZ
 import * as React from "react";
 import { DelayedFunction } from "VSS/Utils/Core";
 import { BrowserCheckUtils } from "VSS/Utils/UI";
+import { trackEvent } from "./events";
 
 interface IMultiValueControlProps {
     selected?: string[];
@@ -112,6 +113,7 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
             e.stopPropagation();
             this._toggleOption(filtered[0]);
             this.setState({filter: ""});
+            trackEvent("enter select");
         }
     }
     private _toggleSelectAll = () => {

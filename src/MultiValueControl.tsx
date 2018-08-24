@@ -115,6 +115,21 @@ export class MultiValueControl extends React.Component<IMultiValueControlProps, 
             this.setState({filter: ""});
             trackEvent("enter select");
         }
+        if (e.keyCode === 37 /* left arrow */) {
+            const input: HTMLInputElement = e.currentTarget;
+            if (input.selectionStart !== input.selectionEnd || input.selectionStart !== 0) {
+                return;
+            }
+            const tags = document.
+                querySelectorAll("#container .multi-value-control .tag-picker [data-selection-index]");
+            if (tags.length === 0) {
+                return;
+            }
+            const lastTag = tags.item(tags.length - 1) as HTMLDivElement;
+            lastTag.focus();
+            e.preventDefault();
+            e.stopPropagation();
+        }
     }
     private _toggleSelectAll = () => {
         const options = this.props.options;
